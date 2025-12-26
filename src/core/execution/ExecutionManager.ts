@@ -1,4 +1,4 @@
-import { Execution, Game } from "../game/Game";
+import { Execution, Game, NationType } from "../game/Game";
 import { PseudoRandom } from "../PseudoRandom";
 import { ClientID, GameID, Intent, Turn } from "../Schemas";
 import { simpleHash } from "../Util";
@@ -22,6 +22,7 @@ import { NationExecution } from "./NationExecution";
 import { NoOpExecution } from "./NoOpExecution";
 import { QuickChatExecution } from "./QuickChatExecution";
 import { RetreatExecution } from "./RetreatExecution";
+import { SetNationTypeExecution } from "./SetNationTypeExecution";
 import { SpawnExecution } from "./SpawnExecution";
 import { TargetPlayerExecution } from "./TargetPlayerExecution";
 import { TransportShipExecution } from "./TransportShipExecution";
@@ -123,6 +124,19 @@ export class Executor {
         );
       case "mark_disconnected":
         return new MarkDisconnectedExecution(player, intent.isDisconnected);
+      case "set_nation_type": {
+        // Convert string to NationType enum
+        const nationTypeMap: Record<string, NationType> = {
+          NONE: NationType.None,
+          MERCHANT: NationType.Merchant,
+          PIRATE: NationType.Pirate,
+          INDUSTRIAL: NationType.Industrial,
+          WARMONGER: NationType.Warmonger,
+          EXPANSIONIST: NationType.Expansionist,
+        };
+        const nationType = nationTypeMap[intent.nationType];
+        return new SetNationTypeExecution(player, nationType);
+      }
       default:
         throw new Error(`intent type ${intent} not found`);
     }

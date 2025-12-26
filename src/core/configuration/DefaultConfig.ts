@@ -9,6 +9,7 @@ import {
   GameType,
   Gold,
   HumansVsNations,
+  NationType,
   Player,
   PlayerInfo,
   PlayerType,
@@ -274,8 +275,13 @@ export class DefaultConfig implements Config {
     return 75;
   }
 
-  defensePostRange(): number {
-    return 30;
+  defensePostRange(player?: Player): number {
+    const baseRange = 30;
+    // Warmonger: Defense posts have 20% more coverage
+    if (player && player.nationType() === NationType.Warmonger) {
+      return Math.floor(baseRange * 1.2);
+    }
+    return baseRange;
   }
 
   defensePostDefenseBonus(): number {
@@ -320,21 +326,39 @@ export class DefaultConfig implements Config {
     return this._gameConfig.donateTroops;
   }
 
-  trainSpawnRate(numPlayerFactories: number): number {
+  trainSpawnRate(numPlayerFactories: number, player?: Player): number {
     // hyperbolic decay, midpoint at 10 factories
     // expected number of trains = numPlayerFactories  / trainSpawnRate(numPlayerFactories)
-    return (numPlayerFactories + 10) * 18;
+    let rate = (numPlayerFactories + 10) * 18;
+
+    // Industrial: Factories generate trains 20% faster (lower rate = faster spawn)
+    if (player && player.nationType() === NationType.Industrial) {
+      rate = Math.floor(rate * 0.8);
+    }
+
+    return rate;
   }
-  trainGold(rel: "self" | "team" | "ally" | "other"): Gold {
+  trainGold(rel: "self" | "team" | "ally" | "other", player?: Player): Gold {
+    let gold: bigint;
     switch (rel) {
       case "ally":
-        return 35_000n;
+        gold = 35_000n;
+        break;
       case "team":
       case "other":
-        return 25_000n;
+        gold = 25_000n;
+        break;
       case "self":
-        return 10_000n;
+        gold = 10_000n;
+        break;
     }
+
+    // Industrial: Factories provide 20% more gold from trains
+    if (player && player.nationType() === NationType.Industrial) {
+      gold = (gold * 12n) / 10n; // 120% of base
+    }
+
+    return gold;
   }
 
   trainStationMinRange(): number {
@@ -347,7 +371,7 @@ export class DefaultConfig implements Config {
     return 120;
   }
 
-  tradeShipGold(dist: number, numPorts: number): Gold {
+  tradeShipGold(dist: number, numPorts: number, player?: Player): Gold {
     // Sigmoid: concave start, sharp S-curve middle, linear end - heavily punishes trades under range debuff.
     const debuff = this.tradeShipShortRangeDebuff();
     const baseGold =
@@ -355,7 +379,14 @@ export class DefaultConfig implements Config {
     const numPortBonus = numPorts - 1;
     // Hyperbolic decay, midpoint at 5 ports, 3x bonus max.
     const bonus = 1 + 2 * (numPortBonus / (numPortBonus + 5));
-    return BigInt(Math.floor(baseGold * bonus));
+    let totalGold = baseGold * bonus;
+
+    // Merchant: Trade ships provide 20% more gold
+    if (player && player.nationType() === NationType.Merchant) {
+      totalGold = totalGold * 1.2;
+    }
+
+    return BigInt(Math.floor(totalGold));
   }
 
   // Probability of trade ship spawn = 1 / tradeShipSpawnRate
@@ -523,6 +554,12 @@ export class DefaultConfig implements Config {
           territoryBound: false,
           experimental: true,
         };
+      case UnitType.Capital:
+        return {
+          cost: this.costWrapper(() => 1_000_000, UnitType.Capital),
+          territoryBound: true,
+          constructionDuration: this.instantBuild() ? 0 : 5 * 10,
+        };
       default:
         assertNever(type);
     }
@@ -542,7 +579,27 @@ export class DefaultConfig implements Config {
           Math.min(player.unitsOwned(type), player.unitsConstructed(type)),
         0,
       );
-      return BigInt(costFn(numUnits));
+      let cost = costFn(numUnits);
+
+      // Apply nation type bonuses
+      const nationType = player.nationType();
+      if (nationType === NationType.Warmonger) {
+        // Warmonger: Defense posts, silos, and SAM launchers are 20% cheaper
+        if (
+          types.includes(UnitType.DefensePost) ||
+          types.includes(UnitType.MissileSilo) ||
+          types.includes(UnitType.SAMLauncher)
+        ) {
+          cost = Math.floor(cost * 0.8);
+        }
+      } else if (nationType === NationType.Expansionist) {
+        // Expansionist: Cities are 20% cheaper
+        if (types.includes(UnitType.City)) {
+          cost = Math.floor(cost * 0.8);
+        }
+      }
+
+      return BigInt(cost);
     };
   }
 
@@ -798,15 +855,22 @@ export class DefaultConfig implements Config {
   }
 
   maxTroops(player: Player | PlayerView): number {
+    let cityBonus =
+      player
+        .units(UnitType.City)
+        .map((city) => city.level())
+        .reduce((a, b) => a + b, 0) * this.cityTroopIncrease();
+
+    // Apply Expansionist nation type bonus (20% more max troops from cities)
+    if (player.nationType() === NationType.Expansionist) {
+      cityBonus = Math.floor(cityBonus * 1.2);
+    }
+
     const maxTroops =
       player.type() === PlayerType.Human && this.infiniteTroops()
         ? 1_000_000_000
         : 2 * (Math.pow(player.numTilesOwned(), 0.6) * 1000 + 50000) +
-          player
-            .units(UnitType.City)
-            .map((city) => city.level())
-            .reduce((a, b) => a + b, 0) *
-            this.cityTroopIncrease();
+          cityBonus;
 
     if (player.type() === PlayerType.Bot) {
       return maxTroops / 3;
@@ -899,9 +963,16 @@ export class DefaultConfig implements Config {
     return 70;
   }
 
-  samRange(level: number): number {
+  samRange(level: number, player?: Player): number {
     // rational growth function (level 1 = 70, level 5 just above hydro range, asymptotically approaches 150)
-    return this.maxSamRange() - 480 / (level + 5);
+    let range = this.maxSamRange() - 480 / (level + 5);
+
+    // Warmonger: SAM launchers have 20% more coverage
+    if (player && player.nationType() === NationType.Warmonger) {
+      range = Math.floor(range * 1.2);
+    }
+
+    return range;
   }
 
   maxSamRange(): number {
@@ -947,8 +1018,13 @@ export class DefaultConfig implements Config {
     return 130;
   }
 
-  warshipShellAttackRate(): number {
-    return 20;
+  warshipShellAttackRate(player?: Player): number {
+    const baseRate = 20;
+    // Pirate: Warships fire 20% faster (lower rate = faster fire)
+    if (player && player.nationType() === NationType.Pirate) {
+      return Math.floor(baseRate * 0.8);
+    }
+    return baseRate;
   }
 
   defensePostShellAttackRate(): number {

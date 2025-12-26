@@ -110,6 +110,13 @@ export const buildTable: BuildItemDisplay[][] = [
       countable: true,
     },
     {
+      unitType: UnitType.Capital,
+      icon: cityIcon,
+      description: "build_menu.desc.capital",
+      key: "unit_type.capital",
+      countable: false,
+    },
+    {
       unitType: UnitType.Factory,
       icon: factoryIcon,
       description: "build_menu.desc.factory",

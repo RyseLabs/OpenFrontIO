@@ -23,6 +23,7 @@ import {
   Gold,
   MessageType,
   MutableAlliance,
+  NationType,
   Player,
   PlayerID,
   PlayerInfo,
@@ -103,6 +104,8 @@ export class PlayerImpl implements Player {
   private _spawnTile: TileRef | undefined;
   private _isDisconnected = false;
 
+  private _nationType: NationType = NationType.None;
+
   constructor(
     private mg: GameImpl,
     private _smallID: number,
@@ -133,6 +136,7 @@ export class PlayerImpl implements Player {
       team: this.team() ?? undefined,
       smallID: this.smallID(),
       playerType: this.type(),
+      nationType: this.nationType(),
       isAlive: this.isAlive(),
       isDisconnected: this.isDisconnected(),
       tilesOwned: this.numTilesOwned(),
@@ -995,6 +999,7 @@ export class PlayerImpl implements Player {
       case UnitType.DefensePost:
       case UnitType.SAMLauncher:
       case UnitType.City:
+      case UnitType.Capital:
       case UnitType.Factory:
         return this.landBasedStructureSpawn(targetTile, validTiles);
       default:
@@ -1136,6 +1141,14 @@ export class PlayerImpl implements Player {
 
   markDisconnected(isDisconnected: boolean): void {
     this._isDisconnected = isDisconnected;
+  }
+
+  nationType(): NationType {
+    return this._nationType;
+  }
+
+  setNationType(type: NationType): void {
+    this._nationType = type;
   }
 
   hash(): number {

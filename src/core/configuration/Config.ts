@@ -129,19 +129,19 @@ export interface Config {
   defaultDonationAmount(sender: Player): number;
   unitInfo(type: UnitType): UnitInfo;
   tradeShipShortRangeDebuff(): number;
-  tradeShipGold(dist: number, numPorts: number): Gold;
+  tradeShipGold(dist: number, numPorts: number, player?: Player): Gold;
   tradeShipSpawnRate(
     numTradeShips: number,
     numPlayerPorts: number,
     numPlayerTradeShips: number,
   ): number;
-  trainGold(rel: "self" | "team" | "ally" | "other"): Gold;
-  trainSpawnRate(numPlayerFactories: number): number;
+  trainGold(rel: "self" | "team" | "ally" | "other", player?: Player): Gold;
+  trainSpawnRate(numPlayerFactories: number, player?: Player): number;
   trainStationMinRange(): number;
   trainStationMaxRange(): number;
   railroadMaxSize(): number;
   safeFromPiratesCooldownMax(): number;
-  defensePostRange(): number;
+  defensePostRange(player?: Player): number;
   SAMCooldown(): number;
   SiloCooldown(): number;
   minDistanceBetweenPlayers(): number;
@@ -149,7 +149,7 @@ export interface Config {
   defensePostSpeedBonus(): number;
   falloutDefenseModifier(percentOfFallout: number): number;
   warshipPatrolRange(): number;
-  warshipShellAttackRate(): number;
+  warshipShellAttackRate(player?: Player): number;
   warshipTargettingRange(): number;
   defensePostShellAttackRate(): number;
   defensePostTargettingRange(): number;
@@ -163,7 +163,7 @@ export interface Config {
   defaultNukeTargetableRange(): number;
   defaultSamMissileSpeed(): number;
   defaultSamRange(): number;
-  samRange(level: number): number;
+  samRange(level: number, player?: Player): number;
   maxSamRange(): number;
   nukeDeathFactor(
     nukeType: NukeType,

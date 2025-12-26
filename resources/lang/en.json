@@ -19,6 +19,22 @@
     "target_dead_note": "You can't send resources to an eliminated player.",
     "none": "None"
   },
+  "nation_type": {
+    "title": "Select Your Nation Type",
+    "description": "Choose a nation type to receive unique bonuses. You can only select this once per game!",
+    "merchant": "Merchant",
+    "merchant_desc": "Trade ships move 20% faster and provide 20% more gold per trade",
+    "pirate": "Pirate",
+    "pirate_desc": "Warships have 20% more health and fire 20% faster",
+    "industrial": "Industrial",
+    "industrial_desc": "Factories generate trains 20% faster and provide 20% more gold",
+    "warmonger": "Warmonger",
+    "warmonger_desc": "Defense posts, silos, and SAM launchers are 20% cheaper and have 20% more coverage",
+    "expansionist": "Expansionist",
+    "expansionist_desc": "Cities are 20% cheaper and provide 20% more max troops",
+    "confirm": "Confirm Selection",
+    "cancel": "Cancel"
+  },
   "main": {
     "title": "OpenFront (ALPHA)",
     "join_discord": "Discord",
@@ -556,6 +572,7 @@
       "port": "Sends trade ships to generate gold",
       "defense_post": "Increases defenses of nearby borders",
       "city": "Increases max population",
+      "capital": "Select your nation type (one per game, provides unique bonuses)",
       "factory": "Creates railroads and spawns trains"
     },
     "not_enough_money": "Not enough money"
@@ -807,6 +824,7 @@
     "steal": "Steal",
     "unit": {
       "city": "City",
+      "capital": "Capital",
       "port": "Port",
       "defp": "Defense Post",
       "saml": "SAM Launcher",

@@ -41,6 +41,10 @@ import { UILayer } from "./layers/UILayer";
 import { UnitDisplay } from "./layers/UnitDisplay";
 import { UnitLayer } from "./layers/UnitLayer";
 import { WinModal } from "./layers/WinModal";
+import { NationTypeModal } from "../NationTypeModal";
+import { MouseUpEvent } from "../InputHandler";
+import { SetNationTypeIntentEvent } from "../Transport";
+import { NationType, UnitType } from "../../core/game/Game";
 
 export function createRenderer(
   canvas: HTMLCanvasElement,
@@ -228,6 +232,44 @@ export function createRenderer(
   }
   spawnTimer.game = game;
   spawnTimer.transformHandler = transformHandler;
+
+  // Setup nation type modal
+  const nationTypeModal = document.querySelector(
+    "nation-type-modal",
+  ) as NationTypeModal;
+  if (!(nationTypeModal instanceof NationTypeModal)) {
+    console.error("nation type modal not found");
+  }
+  nationTypeModal.onSelect = (nationType) => {
+    eventBus.emit(new SetNationTypeIntentEvent(nationType));
+    nationTypeModal.close();
+  };
+
+  // Handle clicks on capital to show nation type modal
+  eventBus.on(MouseUpEvent, (e) => {
+    const myPlayer = game.myPlayer();
+    if (!myPlayer || myPlayer.nationType() !== NationType.None) {
+      return; // Only show if player hasn't selected a nation type yet
+    }
+
+    const worldCoords = transformHandler.screenToWorldCoordinates(e.x, e.y);
+    if (!game.isValidCoord(worldCoords.x, worldCoords.y)) {
+      return;
+    }
+
+    const tile = game.ref(worldCoords.x, worldCoords.y);
+    const units = game.nearbyUnits(tile, 1, UnitType.Capital);
+    
+    for (const { unit } of units) {
+      if (
+        unit.type() === UnitType.Capital &&
+        unit.owner() === myPlayer
+      ) {
+        nationTypeModal.open();
+        break;
+      }
+    }
+  });
 
   // When updating these layers please be mindful of the order.
   // Try to group layers by the return value of shouldTransform.

@@ -13,6 +13,7 @@ import shieldIcon from "../../../../resources/images/ShieldIcon.png";
 
 export const STRUCTURE_SHAPES: Partial<Record<UnitType, ShapeType>> = {
   [UnitType.City]: "circle",
+  [UnitType.Capital]: "circle",
   [UnitType.Port]: "pentagon",
   [UnitType.Factory]: "circle",
   [UnitType.DefensePost]: "octagon",
@@ -58,6 +59,7 @@ export class SpriteFactory {
     { iconPath: string; image: HTMLImageElement | null }
   > = new Map([
     [UnitType.City, { iconPath: cityIcon, image: null }],
+    [UnitType.Capital, { iconPath: cityIcon, image: null }],
     [UnitType.Factory, { iconPath: factoryIcon, image: null }],
     [UnitType.DefensePost, { iconPath: shieldIcon, image: null }],
     [UnitType.Port, { iconPath: anchorIcon, image: null }],

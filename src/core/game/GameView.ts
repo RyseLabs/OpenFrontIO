@@ -12,6 +12,7 @@ import {
   GameUpdates,
   Gold,
   NameViewData,
+  NationType,
   PlayerActions,
   PlayerBorderTiles,
   PlayerID,
@@ -466,6 +467,9 @@ export class PlayerView {
   }
   type(): PlayerType {
     return this.data.playerType;
+  }
+  nationType(): NationType {
+    return this.data.nationType;
   }
   isAlive(): boolean {
     return this.data.isAlive;

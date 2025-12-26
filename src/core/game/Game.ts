@@ -205,6 +205,7 @@ export enum UnitType {
   MIRVWarhead = "MIRV Warhead",
   Train = "Train",
   Factory = "Factory",
+  Capital = "Capital",
 }
 
 export enum TrainType {
@@ -219,6 +220,7 @@ const _structureTypes: ReadonlySet<UnitType> = new Set([
   UnitType.MissileSilo,
   UnitType.Port,
   UnitType.Factory,
+  UnitType.Capital,
 ]);
 
 export function isStructureType(type: UnitType): boolean {
@@ -280,6 +282,8 @@ export interface UnitParamsMap {
 
   [UnitType.City]: Record<string, never>;
 
+  [UnitType.Capital]: Record<string, never>;
+
   [UnitType.MIRV]: {
     targetTile?: number;
   };
@@ -306,6 +310,15 @@ export enum Relation {
   Distrustful = 1,
   Neutral = 2,
   Friendly = 3,
+}
+
+export enum NationType {
+  None = "NONE",
+  Merchant = "MERCHANT",
+  Pirate = "PIRATE",
+  Industrial = "INDUSTRIAL",
+  Warmonger = "WARMONGER",
+  Expansionist = "EXPANSIONIST",
 }
 
 export class Nation {
@@ -545,6 +558,10 @@ export interface Player {
   markTraitor(): void;
   largestClusterBoundingBox: { min: Cell; max: Cell } | null;
   lastTileChange(): Tick;
+
+  // Nation Type
+  nationType(): NationType;
+  setNationType(type: NationType): void;
 
   isDisconnected(): boolean;
   markDisconnected(isDisconnected: boolean): void;
