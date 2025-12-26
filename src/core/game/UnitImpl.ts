@@ -2,6 +2,7 @@ import { simpleHash, toInt, withinInt } from "../Util";
 import {
   AllUnitParams,
   MessageType,
+  NationType,
   Player,
   Tick,
   TrainType,
@@ -51,12 +52,15 @@ export class UnitImpl implements Unit {
     params: AllUnitParams = {},
   ) {
     this._lastTile = _tile;
-    const maxHealthValue = this.mg.unitInfo(_type).maxHealth;
-    this._health = toInt(
-      typeof maxHealthValue === "function"
-        ? maxHealthValue(this.mg, this._owner)
-        : maxHealthValue ?? 1,
-    );
+    let maxHealth = this.mg.unitInfo(_type).maxHealth ?? 1;
+    // Apply Pirate nation type bonus for warships
+    if (
+      _type === UnitType.Warship &&
+      _owner.nationType() === NationType.Pirate
+    ) {
+      maxHealth = Math.floor(maxHealth * 1.2);
+    }
+    this._health = toInt(maxHealth);
     this._targetTile =
       "targetTile" in params ? (params.targetTile ?? undefined) : undefined;
     this._trajectory = "trajectory" in params ? (params.trajectory ?? []) : [];
@@ -222,11 +226,14 @@ export class UnitImpl implements Unit {
   }
 
   modifyHealth(delta: number, attacker?: Player): void {
-    const maxHealthValue = this.info().maxHealth;
-    const maxHealth =
-      typeof maxHealthValue === "function"
-        ? maxHealthValue(this.mg, this._owner)
-        : maxHealthValue ?? 1;
+    let maxHealth = this.info().maxHealth ?? 1;
+    // Apply Pirate nation type bonus for warships
+    if (
+      this._type === UnitType.Warship &&
+      this._owner.nationType() === NationType.Pirate
+    ) {
+      maxHealth = Math.floor(maxHealth * 1.2);
+    }
     this._health = withinInt(this._health + toInt(delta), 0n, toInt(maxHealth));
     if (this._health === 0n) {
       this.delete(true, attacker);

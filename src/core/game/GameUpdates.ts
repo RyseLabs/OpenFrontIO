@@ -5,6 +5,7 @@ import {
   Gold,
   MessageType,
   NameViewData,
+  NationType,
   PlayerID,
   PlayerType,
   Team,
@@ -154,6 +155,7 @@ export interface PlayerUpdate {
   team?: Team;
   smallID: number;
   playerType: PlayerType;
+  nationType: NationType;
   isAlive: boolean;
   isDisconnected: boolean;
   tilesOwned: number;

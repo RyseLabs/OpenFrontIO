@@ -439,14 +439,7 @@ export class DefaultConfig implements Config {
             UnitType.Warship,
           ),
           territoryBound: false,
-          maxHealth: (game: Game, player: Player) => {
-            const baseHealth = 1000;
-            // Pirate: Warships have 20% more health
-            if (player.nationType() === NationType.Pirate) {
-              return Math.floor(baseHealth * 1.2);
-            }
-            return baseHealth;
-          },
+          maxHealth: 1000,
         };
       case UnitType.Shell:
         return {

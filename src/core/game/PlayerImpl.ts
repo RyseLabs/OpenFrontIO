@@ -136,6 +136,7 @@ export class PlayerImpl implements Player {
       team: this.team() ?? undefined,
       smallID: this.smallID(),
       playerType: this.type(),
+      nationType: this.nationType(),
       isAlive: this.isAlive(),
       isDisconnected: this.isDisconnected(),
       tilesOwned: this.numTilesOwned(),
