@@ -180,7 +180,7 @@ export interface UnitInfo {
   cost: (game: Game, player: Player) => Gold;
   // Determines if its owner changes when its tile is conquered.
   territoryBound: boolean;
-  maxHealth?: number;
+  maxHealth?: number | ((game: Game, player: Player) => number);
   damage?: number;
   constructionDuration?: number;
   upgradable?: boolean;

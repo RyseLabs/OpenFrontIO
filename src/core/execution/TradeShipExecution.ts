@@ -138,6 +138,7 @@ export class TradeShipExecution implements Execution {
       .tradeShipGold(
         this.tilesTraveled,
         this.tradeShip!.owner().unitCount(UnitType.Port),
+        this.tradeShip!.owner(),
       );
 
     if (this.wasCaptured) {

@@ -151,7 +151,9 @@ export class WarshipExecution implements Execution {
   }
 
   private shootTarget() {
-    const shellAttackRate = this.mg.config().warshipShellAttackRate();
+    const shellAttackRate = this.mg
+      .config()
+      .warshipShellAttackRate(this.warship.owner());
     if (this.mg.ticks() - this.lastShellAttack > shellAttackRate) {
       if (this.warship.targetUnit()?.type() !== UnitType.TransportShip) {
         // Warships don't need to reload when attacking transport ships.

@@ -51,7 +51,12 @@ export class UnitImpl implements Unit {
     params: AllUnitParams = {},
   ) {
     this._lastTile = _tile;
-    this._health = toInt(this.mg.unitInfo(_type).maxHealth ?? 1);
+    const maxHealthValue = this.mg.unitInfo(_type).maxHealth;
+    this._health = toInt(
+      typeof maxHealthValue === "function"
+        ? maxHealthValue(this.mg, this._owner)
+        : maxHealthValue ?? 1,
+    );
     this._targetTile =
       "targetTile" in params ? (params.targetTile ?? undefined) : undefined;
     this._trajectory = "trajectory" in params ? (params.trajectory ?? []) : [];
@@ -217,11 +222,12 @@ export class UnitImpl implements Unit {
   }
 
   modifyHealth(delta: number, attacker?: Player): void {
-    this._health = withinInt(
-      this._health + toInt(delta),
-      0n,
-      toInt(this.info().maxHealth ?? 1),
-    );
+    const maxHealthValue = this.info().maxHealth;
+    const maxHealth =
+      typeof maxHealthValue === "function"
+        ? maxHealthValue(this.mg, this._owner)
+        : maxHealthValue ?? 1;
+    this._health = withinInt(this._health + toInt(delta), 0n, toInt(maxHealth));
     if (this._health === 0n) {
       this.delete(true, attacker);
     }

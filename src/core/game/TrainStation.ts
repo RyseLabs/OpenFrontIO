@@ -25,7 +25,9 @@ class CityStopHandler implements TrainStopHandler {
   ): void {
     const stationOwner = station.unit.owner();
     const trainOwner = trainExecution.owner();
-    const goldBonus = mg.config().trainGold(rel(trainOwner, stationOwner));
+    const goldBonus = mg
+      .config()
+      .trainGold(rel(trainOwner, stationOwner), trainOwner);
     // Share revenue with the station owner if it's not the current player
     if (trainOwner !== stationOwner) {
       stationOwner.addGold(goldBonus, station.tile());
@@ -43,7 +45,9 @@ class PortStopHandler implements TrainStopHandler {
   ): void {
     const stationOwner = station.unit.owner();
     const trainOwner = trainExecution.owner();
-    const goldBonus = mg.config().trainGold(rel(trainOwner, stationOwner));
+    const goldBonus = mg
+      .config()
+      .trainGold(rel(trainOwner, stationOwner), trainOwner);
 
     trainOwner.addGold(goldBonus, station.tile());
     // Share revenue with the station owner if it's not the current player
