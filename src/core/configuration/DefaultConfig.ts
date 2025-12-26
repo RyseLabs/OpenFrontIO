@@ -523,6 +523,12 @@ export class DefaultConfig implements Config {
           territoryBound: false,
           experimental: true,
         };
+      case UnitType.Capital:
+        return {
+          cost: this.costWrapper(() => 1_000_000, UnitType.Capital),
+          territoryBound: true,
+          constructionDuration: this.instantBuild() ? 0 : 5 * 10,
+        };
       default:
         assertNever(type);
     }
