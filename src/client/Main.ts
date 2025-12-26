@@ -30,6 +30,7 @@ import { LangSelector } from "./LangSelector";
 import { LanguageModal } from "./LanguageModal";
 import "./Matchmaking";
 import { MatchmakingModal } from "./Matchmaking";
+import "./NationTypeModal";
 import "./NewsModal";
 import "./PublicLobby";
 import { PublicLobby } from "./PublicLobby";

@@ -174,6 +174,10 @@ export class SendKickPlayerIntentEvent implements GameEvent {
   constructor(public readonly target: string) {}
 }
 
+export class SetNationTypeIntentEvent implements GameEvent {
+  constructor(public readonly nationType: string) {}
+}
+
 export class Transport {
   private socket: WebSocket | null = null;
 
@@ -257,6 +261,10 @@ export class Transport {
 
     this.eventBus.on(SendKickPlayerIntentEvent, (e) =>
       this.onSendKickPlayerIntent(e),
+    );
+
+    this.eventBus.on(SetNationTypeIntentEvent, (e) =>
+      this.onSetNationTypeIntent(e),
     );
   }
 
@@ -657,6 +665,20 @@ export class Transport {
       type: "kick_player",
       clientID: this.lobbyConfig.clientID,
       target: event.target,
+    });
+  }
+
+  private onSetNationTypeIntent(event: SetNationTypeIntentEvent) {
+    this.sendIntent({
+      type: "set_nation_type",
+      clientID: this.lobbyConfig.clientID,
+      nationType: event.nationType as
+        | "NONE"
+        | "MERCHANT"
+        | "PIRATE"
+        | "INDUSTRIAL"
+        | "WARMONGER"
+        | "EXPANSIONIST",
     });
   }
 

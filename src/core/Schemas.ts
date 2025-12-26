@@ -47,7 +47,8 @@ export type Intent =
   | EmbargoAllIntent
   | UpgradeStructureIntent
   | DeleteUnitIntent
-  | KickPlayerIntent;
+  | KickPlayerIntent
+  | SetNationTypeIntent;
 
 export type AttackIntent = z.infer<typeof AttackIntentSchema>;
 export type CancelAttackIntent = z.infer<typeof CancelAttackIntentSchema>;
@@ -79,6 +80,7 @@ export type AllianceExtensionIntent = z.infer<
 >;
 export type DeleteUnitIntent = z.infer<typeof DeleteUnitIntentSchema>;
 export type KickPlayerIntent = z.infer<typeof KickPlayerIntentSchema>;
+export type SetNationTypeIntent = z.infer<typeof SetNationTypeIntentSchema>;
 
 export type Turn = z.infer<typeof TurnSchema>;
 export type GameConfig = z.infer<typeof GameConfigSchema>;
@@ -354,6 +356,18 @@ export const KickPlayerIntentSchema = BaseIntentSchema.extend({
   target: ID,
 });
 
+export const SetNationTypeIntentSchema = BaseIntentSchema.extend({
+  type: z.literal("set_nation_type"),
+  nationType: z.enum([
+    "NONE",
+    "MERCHANT",
+    "PIRATE",
+    "INDUSTRIAL",
+    "WARMONGER",
+    "EXPANSIONIST",
+  ]),
+});
+
 const IntentSchema = z.discriminatedUnion("type", [
   AttackIntentSchema,
   CancelAttackIntentSchema,
@@ -377,6 +391,7 @@ const IntentSchema = z.discriminatedUnion("type", [
   AllianceExtensionIntentSchema,
   DeleteUnitIntentSchema,
   KickPlayerIntentSchema,
+  SetNationTypeIntentSchema,
 ]);
 
 //
